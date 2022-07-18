@@ -2,19 +2,19 @@
 
 namespace DesafioStone.Models
 {
-    public class Conta
+    public class Account
     {
         [Key]
         [Required]
         public int Id { get; set; }
-        [StringLength(30, ErrorMessage = "O nome do titular não pode passar de 30 caracteres")]
-        public string Titular { get; set; }
-        public double Saldo { get; set; }
-        //private double Saldo;
-        //public double Saldo {
+        [StringLength(30, ErrorMessage = "O nome do OwnerOfAccount não pode passar de 30 caracteres")]
+        public string OwnerOfAccount { get; set; }
+        public double Balance { get; set; }
+        //private double Balance;
+        //public double Balance {
         //    get
         //    {
-        //        return Saldo;
+        //        return Balance;
         //    }
         //    set
         //    {
@@ -22,7 +22,7 @@ namespace DesafioStone.Models
         //        {
         //            return;
         //        }
-        //        Saldo = value;
+        //        Balance = value;
         //    }
         //}
 

@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DesafioStone.Migrations
 {
-    [DbContext(typeof(ContaContext))]
-    [Migration("20220718120301_CriandoTabelaDeContas")]
+    [DbContext(typeof(AccountContext))]
+    [Migration("20220718160349_CriandoTabelaDeContas")]
     partial class CriandoTabelaDeContas
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,22 +18,22 @@ namespace DesafioStone.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.5");
 
-            modelBuilder.Entity("DesafioStone.Models.Conta", b =>
+            modelBuilder.Entity("DesafioStone.Models.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<double>("Saldo")
+                    b.Property<double>("Balance")
                         .HasColumnType("double");
 
-                    b.Property<string>("Titular")
+                    b.Property<string>("OwnerOfAccount")
                         .HasMaxLength(30)
                         .HasColumnType("varchar(30)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contas");
+                    b.ToTable("Accounts");
                 });
 #pragma warning restore 612, 618
         }
