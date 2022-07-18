@@ -22,34 +22,60 @@ namespace DesafioStone.Controllers
         }
 
         [HttpPost]
-        public void CreateAccount([FromBody] CreateAccountDto contaDto)
+        public IActionResult CreateAccount([FromBody] CreateAccountDto contaDto)
         {
             Conta conta = new Conta
             {
                 Titular = contaDto.Titular,
                 Saldo = contaDto.Saldo,
-                
+
             };
             _context.Contas.Add(conta);
             _context.SaveChanges();
-            Console.WriteLine(conta.Titular);
+            return CreatedAtAction(nameof(Extract), new { id = conta.Id }, conta);
         }
-        [HttpPut("{id}")]
-        public IActionResult Deposit(int id,[FromBody] DepositDto valorSomadoDto)
+        [HttpPatch("{id}")]
+        public IActionResult Deposit(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)
         {
             Conta conta = _context.Contas.FirstOrDefault(conta => conta.Id == id);
             if (conta == null)
             {
                 return NotFound();
             }
-            conta.Saldo = valorSomadoDto.Saldo + conta.Saldo;
-            _context.SaveChanges();
-            return Ok(conta.Saldo);
+            if (alternatedValueDto.Deposit == false && conta.Saldo >= alternatedValueDto.Saldo)
+            {
+                conta.Saldo -= alternatedValueDto.Saldo;
+                _context.SaveChanges();
+                return Ok(conta.Saldo);
+            }
+            if (alternatedValueDto.Deposit == true)
+            {
+                conta.Saldo = alternatedValueDto.Saldo * 0.99 + conta.Saldo;
+                _context.SaveChanges();
+                return Ok(conta.Saldo);
+            }
+            return BadRequest();
         }
         [HttpGet]
-        public IEnumerable<Conta> GetAccount()
+        public IEnumerable<Conta> GetAccounts()
         {
             return _context.Contas;
+        }
+        [HttpGet("{id}")]
+        public IActionResult Extract(int id)
+        {
+            Conta conta = _context.Contas.FirstOrDefault(conta => conta.Id == id);
+            if (conta != null)
+            {
+                ExtractDto extractDto = new ExtractDto
+                {
+                    Id = conta.Id,
+                    Titular = conta.Titular,
+                    Saldo = conta.Saldo
+                };
+                return Ok(extractDto);
+            }
+            return NotFound();
         }
     }
 }

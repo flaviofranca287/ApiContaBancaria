@@ -10,11 +10,11 @@ namespace DesafioStone.Models
         [StringLength(30, ErrorMessage = "O nome do titular não pode passar de 30 caracteres")]
         public string Titular { get; set; }
         public double Saldo { get; set; }
-        //private double saldo;
+        //private double Saldo;
         //public double Saldo {
         //    get
         //    {
-        //        return saldo;
+        //        return Saldo;
         //    }
         //    set
         //    {
@@ -22,7 +22,7 @@ namespace DesafioStone.Models
         //        {
         //            return;
         //        }
-        //        saldo = value;
+        //        Saldo = value;
         //    }
         //}
 

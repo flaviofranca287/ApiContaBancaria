@@ -41,6 +41,7 @@ namespace DesafioStone
         {
             if (env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage(); //Apagar depois
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DesafioStone v1"));
