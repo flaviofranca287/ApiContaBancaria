@@ -42,21 +42,20 @@ namespace DesafioStone.Controllers
             {
                 return NotFound();
             }
-            if (alternatedValueDto.Deposit == false && account.Balance >= alternatedValueDto.Balance)
+            if (alternatedValueDto.Deposit == false && account.Balance >= alternatedValueDto.Balance - 4)
             {
                 double bankTax = 4.00;
-                account.Balance -= alternatedValueDto.Balance;
+                account.Balance -= alternatedValueDto.Balance - bankTax;
                 _context.SaveChanges();
                 return Ok(account.Balance);
             }
             if (alternatedValueDto.Deposit == true)
             {
-                //revisar
                 double bankTax = alternatedValueDto.Balance * 0.01;
                 double aux = alternatedValueDto.Balance - bankTax;
                 account.Balance = aux + account.Balance;
                 _context.SaveChanges();
-                return Ok("Saldo da conta após o depósito: R$"+account.Balance);
+                return Ok("Saldo da conta após o depósito: R$" + account.Balance);
             }
             return BadRequest();
         }
