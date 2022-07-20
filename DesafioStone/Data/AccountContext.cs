@@ -12,5 +12,7 @@ namespace DesafioStone.Data
         }
         // é o nosso conjunto de dados do banco que vamos conseguir fazer de maneira encapsulada o acesso aos dados do banco.
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }//Isso é uma entidade, necessariamente é uma tabela de dados.
     }
 }
+//Unit of work pesquisar
