@@ -29,6 +29,8 @@ namespace DesafioStone
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AccountContext>(opts => opts.UseMySQL(Configuration.GetConnectionString("AccountConnection")));
+            services.AddScoped<IAccountServices, AccountServices>(); // To registrando um serviço
+            services.AddScoped<IAccountRepository, AccountRepository>();
             //services.AddDbContext<TransactionContext>(opts => opts.UseMySQL(Configuration.GetConnectionString("TransactionConnection")));
             services.AddControllers();
             services.AddSwaggerGen(c =>

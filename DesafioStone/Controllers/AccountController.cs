@@ -6,33 +6,32 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace DesafioStone.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+
     public class AccountController : ControllerBase
     {
         private Data.AccountContext _context;
-        public AccountController(Data.AccountContext context)
+        private IAccountServices _accountServices;
+        public AccountController(AccountContext context, IAccountServices services)
         {
             _context = context;
+            _accountServices = services;
         }
 
         [HttpPost]
         //CreateAccountDto pode ser create account request
-        public IActionResult CreateAccount([FromBody] CreateAccountDto accountDto)
+        public ActionResult CreateAccount([FromBody] CreateAccountRequest createAccountRequest)
         {
-            Models.Account account = new Models.Account
-            {
-                OwnerOfAccount = accountDto.OwnerOfAccount,
-                Balance = accountDto.Balance,
-            };
+            var response = _accountServices.CreateAccount(createAccountRequest);
 
-            _context.Accounts.Add(account);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(Extract), new { id = account.Id }, account);
+            return StatusCode((int)HttpStatusCode.Created,response);
+
         }
         [HttpPost("deposito/{id}")]
         public IActionResult Deposit(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)

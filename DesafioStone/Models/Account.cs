@@ -13,6 +13,24 @@ namespace DesafioStone.Models
         public string OwnerOfAccount { get; set; }
         public double Balance { get; set; }
 
+        public Account(string ownerOfAccount)
+        {
+            Balance = 0;
+            OwnerOfAccount = ownerOfAccount;
+        }
+        public Account()
+        {
+
+        }
+
+        public bool EuPossoSacar( double valor)
+        {
+            if ( Balance >= valor)
+            {
+                return true;
+            }
+            return false;
+        }
 
     }
 }
