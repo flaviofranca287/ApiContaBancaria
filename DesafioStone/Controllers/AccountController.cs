@@ -42,18 +42,21 @@ namespace DesafioStone.Controllers
             {
                 return NotFound();
             }
-            double bankTax = alternatedValueDto.Balance * 0.01;
-            double aux = alternatedValueDto.Balance - bankTax;
+          
+            double bankTax = alternatedValueDto.ValueOfTransaction * 0.01;
+            double aux = alternatedValueDto.ValueOfTransaction - bankTax;
             account.Balance = aux + account.Balance;
             _context.Transactions.Add(new Transaction()
             {
                 TransactionDate = DateTime.Now,
                 NameTransactor = account.OwnerOfAccount,
                 NameReceiver = account.OwnerOfAccount,
-                TransactionValue = alternatedValueDto.Balance,
+                TransactionValue = alternatedValueDto.ValueOfTransaction,
                 TransactionType = "Depósito",
-                IdTransactor = account.Id
+                IdTransactor = account.Id,
+                IdReceiver = account.Id
             });
+            Console.WriteLine(account.OwnerOfAccount);
             _context.SaveChanges();
             return Ok("Saldo da conta após o depósito: R$" + account.Balance);
 
@@ -67,21 +70,21 @@ namespace DesafioStone.Controllers
             {
                 return NotFound();
             }
-            if (account.Balance >= alternatedValueDto.Balance - 4)
+            if (account.Balance >= alternatedValueDto.ValueOfTransaction - 4)
             {
                 double bankTax = 4.00;
-                account.Balance -= alternatedValueDto.Balance - bankTax;
+                account.Balance -= alternatedValueDto.ValueOfTransaction - bankTax;
                 _context.Transactions.Add(new Transaction()
                 {
                     TransactionDate = DateTime.Now,
                     NameTransactor = account.OwnerOfAccount,
                     NameReceiver = account.OwnerOfAccount,
-                    TransactionValue = alternatedValueDto.Balance,
+                    TransactionValue = alternatedValueDto.ValueOfTransaction,
                     TransactionType = "Saque",
-                    IdTransactor = account.Id
-
+                    IdTransactor = account.Id,
+                    IdReceiver = account.Id
                 });
-                _context.SaveChanges(); 
+                _context.SaveChanges();
                 //account.balance é um dado bruto, eu deveria passar um response trabalhado,o comprovante de saque tem que ter o que?? O valor que eu to sacando, a conta que ta saindo,a hora e o valor que ficou lá.
                 return Ok(account.Balance);
             }
@@ -95,16 +98,16 @@ namespace DesafioStone.Controllers
         [HttpGet("transactions")]
         public IEnumerable<Models.Transaction> GetTransactions()
         {
-            
+
             return _context.Transactions;
         }
-        [HttpGet("transactions/{idTransactor}")]
-        public IActionResult GetTransactionById(int idTransactor)
+        [HttpGet("transactions/{idTransactorOrReceiver}")]
+        public IActionResult GetTransactionById(int idTransactorOrReceiver)
         {
             //Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
             //Models.Transaction transaction = (Transaction)Queryable.Where(_context.Transactions, q => q.IdTransactor == idTransactor);
             //é mais fácil usar o contexto que eu tenho pronto do accountcontext
-            List<Models.Transaction> transactions = _context.Transactions.Where(transaction => transaction.IdTransactor == idTransactor).ToList();
+            List<Models.Transaction> transactions = _context.Transactions.Where(transaction => (transaction.IdTransactor == idTransactorOrReceiver)||(transaction.IdReceiver == idTransactorOrReceiver)).ToList();
 
             var response = new List<TransactionExtractDto>();
             if (transactions.Any())
@@ -119,6 +122,8 @@ namespace DesafioStone.Controllers
                         TransactionValue = transaction.TransactionValue,
                         TransactionDate = transaction.TransactionDate,
                         IdReceiver = transaction.IdReceiver,
+                        NameReceiver = transaction.NameReceiver,
+                        NameTransactor = transaction.NameTransactor
                     });
                 }
                 return Ok(response);
@@ -174,6 +179,7 @@ namespace DesafioStone.Controllers
                 TransactionValue = transactionDto.TransactionValue,
                 TransactionType = "Transferência Bancária",
                 IdTransactor = accountTransactor.Id,
+                IdReceiver = accountReceiver.Id
             });
             _context.SaveChanges();
             return NoContent();
