@@ -18,11 +18,14 @@ namespace DesafioStone.Models
             Balance = 0;
             OwnerOfAccount = ownerOfAccount;
         }
+        public Account(int id)
+        {
+            Id = id;
+        }
         public Account()
         {
 
         }
-
         public bool EuPossoSacar( double valor)
         {
             if ( Balance >= valor)

@@ -147,17 +147,13 @@ namespace DesafioStone.Controllers
             }
             return NotFound();
         }
-        [HttpDelete("{id}")]
-        public IActionResult DeleteAccount(int id)
+        [HttpDelete]
+        public ActionResult DeleteAccount([FromBody] DeleteAccountRequest deleteAccountRequest)
         {
-            Account account = _context.Accounts.FirstOrDefault(account => account.Id == id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-            _context.Remove(account);
-            _context.SaveChanges();
-            return NoContent();
+
+            var response = _accountServices.DeleteAccount(deleteAccountRequest);
+
+            return StatusCode((int)HttpStatusCode.NoContent, response);
         }
         [HttpPost("transaction")]
         public IActionResult TransactionBetweenAccounts(int idTransactor, int idReceiver, [FromBody] TransactionDto transactionDto)

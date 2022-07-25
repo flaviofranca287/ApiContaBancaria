@@ -5,6 +5,9 @@
         //Todo mundo que extenda esse repositorio tenha algo em comum
         //Quem implementar essa interface vai ter que colocar um "adicionar" por exemplo
         T Add(T entity);//A classe que eu to extendendo vai servir como objeto de inserção
+        T Remove(T entity);
+        //T Update(T entity);
+        //T Update(T entity);
         //Um T quer dizer que ele é genérico e vai retornar a entidade que eu to inserindo
     }
 }
