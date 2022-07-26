@@ -1,4 +1,6 @@
-﻿namespace DesafioStone
+﻿using System.Linq;
+
+namespace DesafioStone
 {
     public interface IRepository<T> where T : class // Quer dizer que qualquer classe pode implementar a interface
     {
@@ -8,6 +10,7 @@
         void Remove(T entity);
         //Um T quer dizer que ele é genérico e vai retornar a entidade que eu to inserindo
         T Get(params object[] values);
+        IQueryable<T> GetAll();
         void Update(T entity);
     }
 }

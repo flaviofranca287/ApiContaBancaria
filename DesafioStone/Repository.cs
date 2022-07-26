@@ -1,6 +1,7 @@
 ﻿using DesafioStone.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 
 namespace DesafioStone
 {
@@ -8,11 +9,13 @@ namespace DesafioStone
     {
         protected DbSet<T> entity;
         protected DbContext _context;
+
         public Repository(DbContext context)
         {
             _context = context;
             this.entity = context != null ? _context.Set<T>() : throw new ArgumentNullException("entities");
         }
+
         public T Add(T entity) // Addtransaction + CreatAccount
         {
             this.entity.Add(entity);
@@ -23,6 +26,11 @@ namespace DesafioStone
         public T Get(params object[] values)
         {
             return this.entity.Find(values); // o find espera que passe para ele uma lista de objetos de parametro
+        }
+
+        public IQueryable<T> GetAll()
+        {
+            return Queryable.Cast<T>(this.entity);
         }
 
         public void Remove(T entity)

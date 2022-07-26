@@ -13,17 +13,17 @@ namespace DesafioStone.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-
     public class AccountController : ControllerBase
     {
-        
         private IAccountServices _accountServices;
         private ITransactionService _transactionService;
+
         public AccountController(IAccountServices services, ITransactionService transactionService)
         {
             _accountServices = services;
             _transactionService = transactionService;
         }
+
         [HttpPost]
         //CreateAccountDto pode ser create account request
         public ActionResult CreateAccount([FromBody] CreateAccountRequest createAccountRequest)
@@ -31,16 +31,16 @@ namespace DesafioStone.Controllers
             var response = _accountServices.CreateAccount(createAccountRequest);
 
             return StatusCode((int)HttpStatusCode.Created, response);
-
         }
+
         [HttpPost("deposito")]
         public IActionResult Deposit([FromBody] DepositRequest depositRequest)
         {
-         
             var response = _transactionService.Deposit(depositRequest);
             return StatusCode((int)HttpStatusCode.OK, response);
         }
-        [HttpPost("saque/{id}")]
+
+        // [HttpPost("saque/{id}")]
         //clientself é uma request
         //public IActionResult BankDraft(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)
         //{
@@ -70,45 +70,53 @@ namespace DesafioStone.Controllers
         //    return BadRequest();
         //}
         [HttpGet]
-        public IEnumerable<Models.Account> GetAccounts()
-        {
-            return _context.Accounts;
-        }
-        [HttpGet("transactions")]
-        public IEnumerable<Models.Transaction> GetTransactions()
+        public ActionResult<IEnumerable<Account>> GetAccounts()
         {
 
-            return _context.Transactions;
+            return Ok(_accountServices.GetAccounts());
         }
-        [HttpGet("transactions/{idTransactorOrReceiver}")]
-        public IActionResult GetTransactionById(int idTransactorOrReceiver)
-        {
-            //Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
-            //Models.Transaction transaction = (Transaction)Queryable.Where(_context.Transactions, q => q.IdTransactor == idTransactor);
-            //é mais fácil usar o contexto que eu tenho pronto do accountcontext
-            List<Models.Transaction> transactions = _context.Transactions.Where(transaction => (transaction.IdTransactor == idTransactorOrReceiver) || (transaction.IdReceiver == idTransactorOrReceiver)).ToList();
 
-            var response = new List<TransactionExtractDto>();
-            if (transactions.Any())
-            {
-                foreach (var transaction in transactions)
-                {
-                    response.Add(new TransactionExtractDto()
-                    {
-                        Id = transaction.Id,
-                        IdTransactor = transaction.IdTransactor,
-                        TransactionType = transaction.TransactionType,
-                        TransactionValue = transaction.TransactionValue,
-                        TransactionDate = transaction.TransactionDate,
-                        IdReceiver = transaction.IdReceiver,
-                        NameReceiver = transaction.NameReceiver,
-                        NameTransactor = transaction.NameTransactor
-                    });
-                }
-                return Ok(response);
-            }
-            return NotFound();
-        }
+        // [HttpGet("transactions")]
+        // public IEnumerable<Models.Transaction> GetTransactions()
+        // {
+        //     return _context.Transactions;
+        // }
+        
+        //Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
+        //Models.Transaction transaction = (Transaction)Queryable.Where(_context.Transactions, q => q.IdTransactor == idTransactor);
+        //é mais fácil usar o contexto que eu tenho pronto do accountcontext
+        
+        // [HttpGet("transactions/{idTransactorOrReceiver}")]
+        // public IActionResult GetTransactionById(int idTransactorOrReceiver)
+        // {
+        //     
+        //     List<Models.Transaction> transactions = _context.Transactions.Where(transaction =>
+        //         (transaction.IdTransactor == idTransactorOrReceiver) ||
+        //         (transaction.IdReceiver == idTransactorOrReceiver)).ToList();
+        //
+        //     var response = new List<TransactionExtractDto>();
+        //     if (transactions.Any())
+        //     {
+        //         foreach (var transaction in transactions)
+        //         {
+        //             response.Add(new TransactionExtractDto()
+        //             {
+        //                 Id = transaction.Id,
+        //                 IdTransactor = transaction.IdTransactor,
+        //                 TransactionType = transaction.TransactionType,
+        //                 TransactionValue = transaction.TransactionValue,
+        //                 TransactionDate = transaction.TransactionDate,
+        //                 IdReceiver = transaction.IdReceiver,
+        //                 NameReceiver = transaction.NameReceiver,
+        //                 NameTransactor = transaction.NameTransactor
+        //             });
+        //         }
+        //
+        //         return Ok(response);
+        //     }
+        //
+        //     return NotFound();
+        // }
 
         //[HttpGet("{id}")]
         //public IActionResult Extract(int id)
@@ -127,7 +135,7 @@ namespace DesafioStone.Controllers
         //    }
         //    return NotFound();
         //}
-
+        
         [HttpDelete]
         public ActionResult DeleteAccount([FromBody] DeleteAccountRequest deleteAccountRequest)
         {

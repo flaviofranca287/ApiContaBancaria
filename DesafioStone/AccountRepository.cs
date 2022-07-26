@@ -15,7 +15,7 @@ namespace DesafioStone
     {
         public AccountRepository(AccountContext context) : base(context) // to extendendo uma classe abstrata que eu vou herdar a injeção de context dela
         {
-
+            
         }
     }
 }

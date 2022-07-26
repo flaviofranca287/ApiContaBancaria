@@ -1,4 +1,6 @@
-﻿using DesafioStone.Data.Dtos;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DesafioStone.Data.Dtos;
 using DesafioStone.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,8 +12,10 @@ namespace DesafioStone.Data
         CreateAccountResponse CreateAccount(CreateAccountRequest request);
         void DeleteAccount(DeleteAccountRequest accountDto);
         Account GetAccount(int id);
+        IEnumerable<Account> GetAccounts();
         void UpdateAccount(Account account);
     }
+
     // O meu objeto está implementando minha interface que é criar a conta e retornar uma response
     public class AccountServices : IAccountServices
     {
@@ -21,6 +25,7 @@ namespace DesafioStone.Data
         {
             _unitOfWork = unitOfWork;
         }
+
         public CreateAccountResponse CreateAccount(CreateAccountRequest accountDto)
         {
             var account = _unitOfWork.AccountRepository.Add(new Models.Account(accountDto.OwnerOfAccount));
@@ -40,6 +45,11 @@ namespace DesafioStone.Data
         public Account GetAccount(int id)
         {
             return _unitOfWork.AccountRepository.Get(id);
+        }
+
+        public IEnumerable<Account> GetAccounts()
+        {
+            return _unitOfWork.AccountRepository.GetAll().ToList();
         }
 
         public void UpdateAccount(Account account)
