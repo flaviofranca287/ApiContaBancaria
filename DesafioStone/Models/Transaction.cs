@@ -20,5 +20,9 @@ namespace DesafioStone.Models
         
         //O meu transaction services vai receber uma solicitação de criação de histórico de transação, com os dados, o tipo de transação, etc.
         // Quem vai montar todo o caso de uso em cima da regra de negócio ´´e o transaction services
+    public Transaction()
+    {
+            
+    }
     }
 }

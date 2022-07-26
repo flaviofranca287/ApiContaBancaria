@@ -1,4 +1,5 @@
 ﻿using DesafioStone.Data.Dtos;
+using DesafioStone.Models;
 using Microsoft.AspNetCore.Mvc;
 
 // Quem verifica se tem dinheiro no domínio aqui.
@@ -6,23 +7,23 @@ namespace DesafioStone.Data
 {
     public interface IAccountServices
     {
-        public CreateAccountResponse CreateAccount(CreateAccountRequest request);
-        public DeleteAccountResponse DeleteAccount(DeleteAccountRequest request);
+        CreateAccountResponse CreateAccount(CreateAccountRequest request);
+        void DeleteAccount(DeleteAccountRequest accountDto);
+        Account GetAccount(int id);
+        void UpdateAccount(Account account);
     }
     // O meu objeto está implementando minha interface que é criar a conta e retornar uma response
     public class AccountServices : IAccountServices
     {
-        private IAccountRepository _accountRepository;
+        private IUnitOfWork _unitOfWork;
 
-        public AccountServices(IAccountRepository accountRepository)
+        public AccountServices(IUnitOfWork unitOfWork)
         {
-            _accountRepository = accountRepository;
+            _unitOfWork = unitOfWork;
         }
         public CreateAccountResponse CreateAccount(CreateAccountRequest accountDto)
         {
-            var account = _accountRepository.Add(new Models.Account(accountDto.OwnerOfAccount));
-
-
+            var account = _unitOfWork.AccountRepository.Add(new Models.Account(accountDto.OwnerOfAccount));
             var response = new CreateAccountResponse()
             {
                 IdAccount = account.Id,
@@ -31,17 +32,19 @@ namespace DesafioStone.Data
             };
             return response;
         }
-
-        public DeleteAccountResponse DeleteAccount(DeleteAccountRequest accountDto)
+        public void DeleteAccount(DeleteAccountRequest accountDto)
         {
-            var account = _accountRepository.Remove(new Models.Account(accountDto.Id));
-            var response = new DeleteAccountResponse()
-            {
-                IdAccount = accountDto.Id,
-                OwnerOfAccount = account.OwnerOfAccount,
-                Balance = account.Balance
-            };
-            return response;
+            _unitOfWork.AccountRepository.Remove(new Models.Account(accountDto.Id));
+        }
+
+        public Account GetAccount(int id)
+        {
+            return _unitOfWork.AccountRepository.Get(id);
+        }
+
+        public void UpdateAccount(Account account)
+        {
+            _unitOfWork.AccountRepository.Update(account);
         }
     }
 }

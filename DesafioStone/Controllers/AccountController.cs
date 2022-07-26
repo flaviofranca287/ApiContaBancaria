@@ -16,79 +16,59 @@ namespace DesafioStone.Controllers
 
     public class AccountController : ControllerBase
     {
-        private Data.AccountContext _context;
+        
         private IAccountServices _accountServices;
-        public AccountController(AccountContext context, IAccountServices services)
+        private ITransactionService _transactionService;
+        public AccountController(IAccountServices services, ITransactionService transactionService)
         {
-            _context = context;
             _accountServices = services;
+            _transactionService = transactionService;
         }
-
         [HttpPost]
         //CreateAccountDto pode ser create account request
         public ActionResult CreateAccount([FromBody] CreateAccountRequest createAccountRequest)
         {
             var response = _accountServices.CreateAccount(createAccountRequest);
 
-            return StatusCode((int)HttpStatusCode.Created,response);
+            return StatusCode((int)HttpStatusCode.Created, response);
 
         }
-        [HttpPost("deposito/{id}")]
-        public IActionResult Deposit(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)
+        [HttpPost("deposito")]
+        public IActionResult Deposit([FromBody] DepositRequest depositRequest)
         {
-            Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-          
-            double bankTax = alternatedValueDto.ValueOfTransaction * 0.01;
-            double aux = alternatedValueDto.ValueOfTransaction - bankTax;
-            account.Balance = aux + account.Balance;
-            _context.Transactions.Add(new Transaction()
-            {
-                TransactionDate = DateTime.Now,
-                NameTransactor = account.OwnerOfAccount,
-                NameReceiver = account.OwnerOfAccount,
-                TransactionValue = alternatedValueDto.ValueOfTransaction,
-                TransactionType = "Depósito",
-                IdTransactor = account.Id,
-                IdReceiver = account.Id
-            });
-            Console.WriteLine(account.OwnerOfAccount);
-            _context.SaveChanges();
-            return Ok("Saldo da conta após o depósito: R$" + account.Balance);
-
+         
+            var response = _transactionService.Deposit(depositRequest);
+            return StatusCode((int)HttpStatusCode.OK, response);
         }
         [HttpPost("saque/{id}")]
         //clientself é uma request
-        public IActionResult BankDraft(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)
-        {
-            Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-            if (account.Balance >= alternatedValueDto.ValueOfTransaction - 4)
-            {
-                double bankTax = 4.00;
-                account.Balance -= alternatedValueDto.ValueOfTransaction - bankTax;
-                _context.Transactions.Add(new Transaction()
-                {
-                    TransactionDate = DateTime.Now,
-                    NameTransactor = account.OwnerOfAccount,
-                    NameReceiver = account.OwnerOfAccount,
-                    TransactionValue = alternatedValueDto.ValueOfTransaction,
-                    TransactionType = "Saque",
-                    IdTransactor = account.Id,
-                    IdReceiver = account.Id
-                });
-                _context.SaveChanges();
-                //account.balance é um dado bruto, eu deveria passar um response trabalhado,o comprovante de saque tem que ter o que?? O valor que eu to sacando, a conta que ta saindo,a hora e o valor que ficou lá.
-                return Ok(account.Balance);
-            }
-            return BadRequest();
-        }
+        //public IActionResult BankDraft(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)
+        //{
+        //    Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
+        //    if (account == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    if (account.Balance >= alternatedValueDto.ValueOfTransaction - 4)
+        //    {
+        //        double bankTax = 4.00;
+        //        account.Balance -= alternatedValueDto.ValueOfTransaction - bankTax;
+        //        _context.Transactions.Add(new Transaction()
+        //        {
+        //            TransactionDate = DateTime.Now,
+        //            NameTransactor = account.OwnerOfAccount,
+        //            NameReceiver = account.OwnerOfAccount,
+        //            TransactionValue = alternatedValueDto.ValueOfTransaction,
+        //            TransactionType = "Saque",
+        //            IdTransactor = account.Id,
+        //            IdReceiver = account.Id
+        //        });
+        //        _context.SaveChanges();
+        //        //account.balance é um dado bruto, eu deveria passar um response trabalhado,o comprovante de saque tem que ter o que?? O valor que eu to sacando, a conta que ta saindo,a hora e o valor que ficou lá.
+        //        return Ok(account.Balance);
+        //    }
+        //    return BadRequest();
+        //}
         [HttpGet]
         public IEnumerable<Models.Account> GetAccounts()
         {
@@ -106,7 +86,7 @@ namespace DesafioStone.Controllers
             //Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
             //Models.Transaction transaction = (Transaction)Queryable.Where(_context.Transactions, q => q.IdTransactor == idTransactor);
             //é mais fácil usar o contexto que eu tenho pronto do accountcontext
-            List<Models.Transaction> transactions = _context.Transactions.Where(transaction => (transaction.IdTransactor == idTransactorOrReceiver)||(transaction.IdReceiver == idTransactorOrReceiver)).ToList();
+            List<Models.Transaction> transactions = _context.Transactions.Where(transaction => (transaction.IdTransactor == idTransactorOrReceiver) || (transaction.IdReceiver == idTransactorOrReceiver)).ToList();
 
             var response = new List<TransactionExtractDto>();
             if (transactions.Any())
@@ -130,54 +110,53 @@ namespace DesafioStone.Controllers
             return NotFound();
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Extract(int id)
-        {
-            Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
-            if (account != null)
-            {
-                ExtractDto extractDto = new ExtractDto
-                {
-                    Id = account.Id,
-                    OwnerOfAccount = account.OwnerOfAccount,
-                    Balance = account.Balance,
+        //[HttpGet("{id}")]
+        //public IActionResult Extract(int id)
+        //{
+        //    Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
+        //    if (account != null)
+        //    {
+        //        ExtractDto extractDto = new ExtractDto
+        //        {
+        //            Id = account.Id,
+        //            OwnerOfAccount = account.OwnerOfAccount,
+        //            Balance = account.Balance,
 
-                };
-                return Ok(extractDto);
-            }
-            return NotFound();
-        }
+        //        };
+        //        return Ok(extractDto);
+        //    }
+        //    return NotFound();
+        //}
+
         [HttpDelete]
         public ActionResult DeleteAccount([FromBody] DeleteAccountRequest deleteAccountRequest)
         {
-
-            var response = _accountServices.DeleteAccount(deleteAccountRequest);
-
-            return StatusCode((int)HttpStatusCode.NoContent, response);
+            _accountServices.DeleteAccount(deleteAccountRequest);
+            return StatusCode((int)HttpStatusCode.OK);
         }
-        [HttpPost("transaction")]
-        public IActionResult TransactionBetweenAccounts(int idTransactor, int idReceiver, [FromBody] TransactionDto transactionDto)
-        {
-            Account accountTransactor = _context.Accounts.FirstOrDefault(accountTransactor => accountTransactor.Id == idTransactor);
-            Account accountReceiver = _context.Accounts.FirstOrDefault(accountReceiver => accountReceiver.Id == idReceiver);
-            if (accountReceiver == null || accountTransactor == null)
-            {
-                return NotFound();
-            }
-            accountTransactor.Balance = accountTransactor.Balance - transactionDto.TransactionValue;
-            accountReceiver.Balance = accountReceiver.Balance + transactionDto.TransactionValue;
-            _context.Transactions.Add(new Transaction()
-            {
-                TransactionDate = DateTime.Now,
-                NameTransactor = accountTransactor.OwnerOfAccount,
-                NameReceiver = accountReceiver.OwnerOfAccount,
-                TransactionValue = transactionDto.TransactionValue,
-                TransactionType = "Transferência Bancária",
-                IdTransactor = accountTransactor.Id,
-                IdReceiver = accountReceiver.Id
-            });
-            _context.SaveChanges();
-            return NoContent();
-        }
+        //[HttpPost("transaction")]
+        //public IActionResult TransactionBetweenAccounts(int idTransactor, int idReceiver, [FromBody] TransactionDto transactionDto)
+        //{
+        //    Account accountTransactor = _context.Accounts.FirstOrDefault(accountTransactor => accountTransactor.Id == idTransactor);
+        //    Account accountReceiver = _context.Accounts.FirstOrDefault(accountReceiver => accountReceiver.Id == idReceiver);
+        //    if (accountReceiver == null || accountTransactor == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    accountTransactor.Balance = accountTransactor.Balance - transactionDto.TransactionValue;
+        //    accountReceiver.Balance = accountReceiver.Balance + transactionDto.TransactionValue;
+        //    _context.Transactions.Add(new Transaction()
+        //    {
+        //        TransactionDate = DateTime.Now,
+        //        NameTransactor = accountTransactor.OwnerOfAccount,
+        //        NameReceiver = accountReceiver.OwnerOfAccount,
+        //        TransactionValue = transactionDto.TransactionValue,
+        //        TransactionType = "Transferência Bancária",
+        //        IdTransactor = accountTransactor.Id,
+        //        IdReceiver = accountReceiver.Id
+        //    });
+        //    _context.SaveChanges();
+        //    return NoContent();
+        //}
     }
 }

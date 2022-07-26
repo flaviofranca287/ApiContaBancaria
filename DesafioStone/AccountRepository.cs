@@ -11,32 +11,18 @@ namespace DesafioStone
     }
     /*Observação legal: quando eu aplico um comportamento de interface na minha classe,
      ela obrigatoriamente tem que ter todos os metodos da minha interface que estou estendendo.*/
-
-
-    public class AccountRepository : IAccountRepository
+    public class AccountRepository : Repository<Account>, IAccountRepository
     {
-        private AccountContext _context;
-        private DbSet<Account> _accounts;
-
-        public AccountRepository(AccountContext context)
+        public AccountRepository(AccountContext context) : base(context) // to extendendo uma classe abstrata que eu vou herdar a injeção de context dela
         {
-            _context = context;
-            _accounts = _context.Set<Account>();
-        }
 
-        public Account Add(Account account)
-        {
-            _accounts.Add(account);
-            _context.SaveChanges();
-            return account;
         }
-        public Account Remove(Account account)
-        {
-            _accounts.Remove(account);
-            _context.SaveChanges();
-            return account;
-        }
-
-        //Preciso recuperar o contexto de conexao com o banco
     }
 }
+//Preciso ter uma camada que saiba instânciar meus objetos
+//Injeção de dependencia é jogar para uma classe ou método um serviço que ela vai depender para utilizar.
+/*Se eu chegar no meu account service e falar: vou fazer um depósito, quando eu fizer  o dep´´osito eu preciso
+ salvar o histórico que ele ocorreu, então eu vou depender de um serviço que salva o histórico(que é o transaction)
+
+A injeção de dependencia reduz a quantidade de codigo qeu eu escrevo e melhora significamente a forma como escrevo testes
+ela recebe uma interface, um contrato de dados que alguem em algum plano implementa aquilo */
