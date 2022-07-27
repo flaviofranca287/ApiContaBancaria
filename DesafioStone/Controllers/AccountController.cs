@@ -40,35 +40,13 @@ namespace DesafioStone.Controllers
             return StatusCode((int)HttpStatusCode.OK, response);
         }
 
-        // [HttpPost("saque/{id}")]
-        //clientself é uma request
-        //public IActionResult BankDraft(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)
-        //{
-        //    Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
-        //    if (account == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    if (account.Balance >= alternatedValueDto.ValueOfTransaction - 4)
-        //    {
-        //        double bankTax = 4.00;
-        //        account.Balance -= alternatedValueDto.ValueOfTransaction - bankTax;
-        //        _context.Transactions.Add(new Transaction()
-        //        {
-        //            TransactionDate = DateTime.Now,
-        //            NameTransactor = account.OwnerOfAccount,
-        //            NameReceiver = account.OwnerOfAccount,
-        //            TransactionValue = alternatedValueDto.ValueOfTransaction,
-        //            TransactionType = "Saque",
-        //            IdTransactor = account.Id,
-        //            IdReceiver = account.Id
-        //        });
-        //        _context.SaveChanges();
-        //        //account.balance é um dado bruto, eu deveria passar um response trabalhado,o comprovante de saque tem que ter o que?? O valor que eu to sacando, a conta que ta saindo,a hora e o valor que ficou lá.
-        //        return Ok(account.Balance);
-        //    }
-        //    return BadRequest();
-        //}
+        [HttpPost("saque")]
+        public IActionResult BankDraft([FromBody] BankDraftRequest bankDraftRequest)
+        {
+            var response = _transactionService.BankDraft((bankDraftRequest));
+            return StatusCode((int)HttpStatusCode.OK, response);
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<Account>> GetAccounts()
         {
@@ -81,11 +59,11 @@ namespace DesafioStone.Controllers
         // {
         //     return _context.Transactions;
         // }
-        
+
         //Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
         //Models.Transaction transaction = (Transaction)Queryable.Where(_context.Transactions, q => q.IdTransactor == idTransactor);
         //é mais fácil usar o contexto que eu tenho pronto do accountcontext
-        
+
         // [HttpGet("transactions/{idTransactorOrReceiver}")]
         // public IActionResult GetTransactionById(int idTransactorOrReceiver)
         // {
@@ -135,7 +113,7 @@ namespace DesafioStone.Controllers
         //    }
         //    return NotFound();
         //}
-        
+
         [HttpDelete]
         public ActionResult DeleteAccount([FromBody] DeleteAccountRequest deleteAccountRequest)
         {
@@ -168,3 +146,30 @@ namespace DesafioStone.Controllers
         //}
     }
 }
+// } public IActionResult BankDraft(int id, [FromBody] ClientSelfTransactionsDto alternatedValueDto)
+// {
+//     Models.Account account = Queryable.FirstOrDefault<Models.Account>(_context.Accounts, account => account.Id == id);
+//     if (account == null)
+//     {
+//         return NotFound();
+//     }
+//     if (account.Balance >= alternatedValueDto.ValueOfTransaction - 4)
+//     {
+//         double bankTax = 4.00;
+//         account.Balance -= alternatedValueDto.ValueOfTransaction - bankTax;
+//         _context.Transactions.Add(new Transaction()
+//         {
+//             TransactionDate = DateTime.Now,
+//             NameTransactor = account.OwnerOfAccount,
+//             NameReceiver = account.OwnerOfAccount,
+//             TransactionValue = alternatedValueDto.ValueOfTransaction,
+//             TransactionType = "Saque",
+//             IdTransactor = account.Id,
+//             IdReceiver = account.Id
+//         });
+//         _context.SaveChanges();
+//         //account.balance é um dado bruto, eu deveria passar um response trabalhado,o comprovante de saque tem que ter o que?? O valor que eu to sacando, a conta que ta saindo,a hora e o valor que ficou lá.
+//         return Ok(account.Balance);
+//     }
+//     return BadRequest();
+// }
