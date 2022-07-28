@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using DesafioStone.Data.Dtos;
 
 namespace DesafioStone
 {
